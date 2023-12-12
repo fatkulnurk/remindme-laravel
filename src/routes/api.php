@@ -18,7 +18,3 @@ Route::post('/session', [\App\Http\Controllers\Api\SessionController::class, 'lo
 Route::put('/session', [\App\Http\Controllers\Api\SessionController::class, 'refresh']);
 Route::apiResource('/reminders', App\Http\Controllers\Api\ReminderController::class)
     ->middleware('auth:sanctum');
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});

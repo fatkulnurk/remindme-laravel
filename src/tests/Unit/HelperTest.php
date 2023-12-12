@@ -17,6 +17,6 @@ class HelperTest extends TestCase
     public function test_to_timestamp_second_passed(): void
     {
         $this->assertEquals(1234567890, to_timestamp_second(1234567890));
-        $this->assertEquals(1234567890, to_timestamp_second(1234567890));
+        $this->assertEquals(1702404750, to_timestamp_second(1702404750090));
     }
 }

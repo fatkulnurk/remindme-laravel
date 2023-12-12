@@ -50,12 +50,21 @@ class SessionController extends Controller
      *
      * @param Request $request The HTTP request object.
      * @return \Illuminate\Http\JsonResponse The JSON response containing the refreshed token.
-     *
-     *  @throws \Exception If there is an error refreshing the token.
      * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#refresh-access-token
      */
     public function refresh(Request $request)
     {
-        return response()->json([]);
+        try {
+            $data = $this->sessionService->refreshToken(
+                refreshToken: $request->bearerToken() ?? ''
+            );
+        } catch (\Exception $exception) {
+
+        }
+
+        return response()->json([
+            'ok' => true,
+            'data' => $data,
+        ]);
     }
 }

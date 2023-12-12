@@ -3,11 +3,13 @@
 namespace App\Services\Sessions;
 
 use App\Enums\Errors\CommonError;
+use App\Enums\Tokens\TokenAbility;
 use App\Enums\Tokens\TokenName;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\PersonalAccessToken;
 
 
 /**
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Log;
  * @package App\Services\Sessions
  * @author  Fatkul Nur Koirudin <https://github.com/fatkulnurk>
  * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#login
+ * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#refresh-access-token
  * */
 class SessionService
 {
@@ -68,6 +71,49 @@ class SessionService
             'user' => $user->only(['id', 'email', 'name']),
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken
+        ];
+    }
+
+    /**
+     * Refreshes the access token using the given refresh token.
+     *
+     * @param string $refreshToken The refresh token to be used for refreshing the access token.
+     * @throws \Exception If the refresh token is invalid or expired.
+     * @return array An array containing the new access token.
+     * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#refresh-access-token
+     */
+    public function refreshToken(string $refreshToken): array
+    {
+        $explode = explode('|', $refreshToken);
+        $personalAccessToken = PersonalAccessToken::query()
+            ->with('tokenable')
+            ->where('name', TokenName::REFRESH_TOKEN->value)
+            ->where('id', $explode[0] ?? null)
+            ->first();
+
+        // all message it same, for prevent https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/03-Identity_Management_Testing/04-Testing_for_Account_Enumeration_and_Guessable_User_Account
+        if (
+            (blank($personalAccessToken)) ||
+            (!hash_equals(($personalAccessToken->token ?? ''), hash('sha256', $explode[1]))) ||
+            (!$personalAccessToken->can(TokenAbility::SESSION_REFRESH->value))
+        ) {
+            throw new \Exception(CommonError::ERR_INVALID_REFRESH_TOKEN->value);
+        }
+
+        Log::info('retrying refresh access token', $personalAccessToken
+            ->tokenable
+            ->only(['id', 'email', 'name'])
+        );
+
+        // create access token
+        $accessToken = $personalAccessToken->tokenable->createToken(
+            name: TokenName::ACCESS_TOKEN->value,
+            abilities: TokenName::ACCESS_TOKEN->getAbilities(),
+            expiresAt: CarbonImmutable::now()->addSecond($this->expires)
+        )->plainTextToken;
+
+        return [
+            'access_token' => $accessToken
         ];
     }
 }

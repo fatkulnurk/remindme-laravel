@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace App\Enums\Errors;
 
 /**
  * The CommonError enum represents common error codes in the application.

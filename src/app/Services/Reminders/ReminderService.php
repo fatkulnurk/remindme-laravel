@@ -63,6 +63,8 @@ class ReminderService
     public function create(Model|Authenticatable $user, array $data): array
     {
         $data['user_id'] = $user->getKey();
+        $data['remind_at'] = to_timestamp_second($data['remind_at']);
+        $data['event_at'] = to_timestamp_second($data['event_at']);
         $reminder = Reminder::query()->create($data);
         $reminder->refresh();
 
@@ -123,6 +125,9 @@ class ReminderService
 
         if (filled($data)) {
             $oldReminder = $reminder->only($this->defaultColumns);
+
+            $data['remind_at'] = isset($data['remind_at']) ? to_timestamp_second($data['remind_at']) : $reminder->remind_at;
+            $data['event_at'] = isset($data['remind_at']) ? to_timestamp_second($data['event_at']) : $reminder->event_at;
             $reminder->update($data);
             $reminder->refresh();
 

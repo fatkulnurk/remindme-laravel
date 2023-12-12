@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Errors\CommonError;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Sessions\LoginRequest;
 use App\Services\Sessions\SessionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @package App\Http\Controllers\Api
@@ -36,7 +38,13 @@ class SessionController extends Controller
                 data: $request->validated()
             );
         } catch (\Exception $exception) {
+            Log::error('login session failed', [
+                'message' => $exception->getMessage(),
+                'trace' => $exception->getTrace(),
+            ]);
+            $error = CommonError::ERR_INVALID_CREDS;
 
+            return response()->json($error->toMap(), $error->httpStatusCode());
         }
 
         return response()->json([
@@ -59,7 +67,13 @@ class SessionController extends Controller
                 refreshToken: $request->bearerToken() ?? ''
             );
         } catch (\Exception $exception) {
+            Log::error('refresh session failed', [
+                'message' => $exception->getMessage(),
+                'trace' => $exception->getTrace(),
+            ]);
+            $error = CommonError::ERR_INVALID_REFRESH_TOKEN;
 
+            return response()->json($error->toMap(), $error->httpStatusCode());
         }
 
         return response()->json([

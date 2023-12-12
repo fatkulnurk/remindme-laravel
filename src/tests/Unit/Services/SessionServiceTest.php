@@ -8,6 +8,10 @@ use Illuminate\Foundation\Testing\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\CreatesApplication;
 
+/**
+ * @package Tests\Unit\Services
+ * @author  Fatkul Nur Koirudin <https://github.com/fatkulnurk>
+ * */
 class SessionServiceTest extends TestCase
 {
     use CreatesApplication;

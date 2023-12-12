@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Sessions\LoginRequest;
+use App\Services\Sessions\SessionService;
 use Illuminate\Http\Request;
 
 /**
@@ -15,13 +16,33 @@ use Illuminate\Http\Request;
 class SessionController extends Controller
 {
     /**
+     * Constructs a new instance of the class.
+     *
+     * @param SessionService $sessionService The session service to use. Defaults to a new instance of SessionService.
+     */
+    public function __construct(private readonly SessionService $sessionService = new SessionService())
+    {
+    }
+
+    /**
      * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#login
      * @param LoginRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(LoginRequest $request)
     {
-        return response()->json([]);
+        try {
+            $data = $this->sessionService->login(
+                data: $request->validated()
+            );
+        } catch (\Exception $exception) {
+
+        }
+
+        return response()->json([
+            'ok' => true,
+            'data' => $data,
+        ]);
     }
 
     /**

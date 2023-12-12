@@ -37,20 +37,20 @@ class DatabaseSeederTest extends TestCase
         $this->assertDatabaseCount('users', 2);
     }
 
-    #[dataProvider('providerData')]
+    #[DataProvider('providerData')]
     public function test_has_valid_user_by_email($email, $password)
     {
         $this->assertDatabaseHas('users', compact('email'));
     }
 
-    #[dataProvider('providerData')]
+    #[DataProvider('providerData')]
     public function test_has_valid_user_by_email_with_failed_scenario($email, $password)
     {
         $email = $email . '__'; // sengaja di append, biar emailnya tidak valid
         $this->assertDatabaseMissing('users', compact('email'));
     }
 
-    #[dataProvider('providerData')]
+    #[DataProvider('providerData')]
     public function test_has_password_valid($email, $password)
     {
         $user = User::query()
@@ -62,7 +62,7 @@ class DatabaseSeederTest extends TestCase
         $this->assertEquals($email, $user->email);
     }
 
-    #[dataProvider('providerData')]
+    #[DataProvider('providerData')]
     public function test_has_password_valid_with_failed_scenario($email, $password)
     {
         $password = $password . '__'; // sengaja di append, biar passwordnya tidak valid

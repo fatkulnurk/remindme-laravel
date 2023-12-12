@@ -67,7 +67,7 @@ class SessionServiceTest extends TestCase
         $this->assertInstanceOf(SessionService::class, (new SessionService()));
     }
 
-    #[dataProvider('providerDataPassed')]
+    #[DataProvider('providerDataPassed')]
     public function test_login_passed($data)
     {
         $tokenData = (new SessionService())->login($data);
@@ -78,7 +78,7 @@ class SessionServiceTest extends TestCase
         $this->assertArrayHasKey('refresh_token', $tokenData);
     }
 
-    #[dataProvider('providerDataFailed')]
+    #[DataProvider('providerDataFailed')]
     public function test_login_failed($data)
     {
         $this->expectException(\Exception::class);

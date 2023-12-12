@@ -5,7 +5,7 @@ namespace App\Enums\Errors;
 /**
  * The CommonError enum represents common error codes in the application.
  *
- * @package App\Enums
+ * @package App\Enums\Errors
  * @author  Fatkul Nur Koirudin <https://github.com/fatkulnurk>
  * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/common_errors.md
  * @link https://github.com/riandyrn/remindme-laravel/blob/3f565565ca94205cffe01d3827c0478a1ae9db4c/docs/rest_api.md?plain=1#L81

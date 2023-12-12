@@ -42,7 +42,7 @@ class SendReminder extends Mailable
         return new Content(
             markdown: 'emails.reminders.send',
             with: [
-                'eventAtFormatter' => CarbonImmutable::createFromTimestamp($this->reminder->event_at/1000)->toDateTimeString(),
+                'eventAtFormatter' => CarbonImmutable::createFromTimestamp($this->reminder->event_at)->toDateTimeString(),
             ]
         );
     }

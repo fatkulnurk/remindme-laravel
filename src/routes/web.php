@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return \Inertia\Inertia::render('Index', [
+        'app_url' => config('app.url')
+    ]);
 });
 
 // fallback if hit api without header Accept: application/json

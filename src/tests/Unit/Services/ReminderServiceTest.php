@@ -244,4 +244,10 @@ class ReminderServiceTest extends TestCase
             modelKey: $reminderKey
         );
     }
+
+
+    public function test_send_reminders_for_schedule()
+    {
+        $this->assertNull((new ReminderService())->sendReminders());
+    }
 }

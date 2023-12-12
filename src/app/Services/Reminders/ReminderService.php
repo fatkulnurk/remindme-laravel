@@ -3,11 +3,15 @@
 namespace App\Services\Reminders;
 
 use App\Enums\Errors\CommonError;
+use App\Mail\Reminders\SendReminder;
 use App\Models\Reminder;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * The ReminderService class provides methods for managing reminders.
@@ -157,5 +161,34 @@ class ReminderService
         $reminder->delete();
 
         return true;
+    }
+
+
+    public function sendReminders(): void
+    {
+        Log::info('send reminders');
+
+        // in milliseconds
+        $unixEpoch = CarbonImmutable::now()->timestamp * 1000;
+        Reminder::query()
+            ->with(['user:id,name,email'])
+            ->whereNull('remind_delivery_at')
+            ->where('remind_at', '<=', $unixEpoch)
+            ->orderBy('remind_at', 'asc')
+            ->chunk(25, function (Collection $reminders) {
+                $reminderKeys = [];
+                foreach ($reminders as $reminder) {
+                    try {
+                        Mail::to($reminder->user->email)->send(new SendReminder($reminder));
+                        $reminderKeys[] = $reminder->id;
+                    } catch (\Exception $exception) {
+                        Log::error('Send Reminder: ' . $exception->getMessage());
+                    }
+                }
+
+                Reminder::query()->whereIn('id', $reminderKeys)->update([
+                    'remind_delivery_at' => CarbonImmutable::now()
+                ]);
+            });
     }
 }

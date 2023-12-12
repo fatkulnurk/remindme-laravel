@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * The TokenName enum represents the name of the token.
  *
- * @package App\Enums\Tokens
+ * @package App\Services\Sessions
  * @author  Fatkul Nur Koirudin <https://github.com/fatkulnurk>
  * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#login
  * */

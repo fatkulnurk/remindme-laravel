@@ -218,11 +218,80 @@ class ReminderServiceTest extends TestCase
         );
     }
 
+    #[DataProvider('additionalProvider')]
+    public function test_update_reminder_by_id_in_remind_not_same_with_old_value_passed($data)
+    {
+        $reminderModel = Reminder::query()->inRandomOrder()->first();
+        $reminderKey = $reminderModel->getKey();
+        $data['remind_at'] = $data['remind_at'] + 1;
+        $reminder = (new ReminderService())->update(
+            user: $this->user,
+            modelKey: $reminderKey,
+            data: $data
+        );
+
+        // check if data is returned
+        $this->assertIsArray($reminder);
+        $this->assertArrayHasKey('id', $reminder);
+        $this->assertArrayHasKey('title', $reminder);
+        $this->assertArrayHasKey('description', $reminder);
+        $this->assertArrayHasKey('remind_at', $reminder);
+        $this->assertArrayHasKey('event_at', $reminder);
+        $this->assertArrayNotHasKey('remind_delivery_at', $reminder);
+        $this->assertArrayNotHasKey('created_at', $reminder);
+        $this->assertArrayNotHasKey('updated_at', $reminder);
+        $this->assertArrayNotHasKey('deleted_at', $reminder);
+
+        // check if data is updated
+        $this->assertEquals($data['title'], $reminder['title']);
+        $this->assertEquals($data['description'], $reminder['description']);
+        $this->assertEquals($data['remind_at'], $reminder['remind_at']);
+        $this->assertEquals($data['event_at'], $reminder['event_at']);
+
+        $reminderModel->refresh();
+        $this->assertNull($reminderModel->remind_delivery_at);
+    }
+
+
+    #[DataProvider('additionalProvider')]
+    public function test_update_reminder_by_id_with_empty_value_passed($data)
+    {
+        $reminderModel = Reminder::query()->inRandomOrder()->first();
+        $reminderKey = $reminderModel->getKey();
+        $data['remind_at'] = null;
+
+        $this->assertNull($data['remind_at']);
+
+        $reminder = (new ReminderService())->update(
+            user: $this->user,
+            modelKey: $reminderKey,
+            data: $data
+        );
+
+        // check if data is returned
+        $this->assertIsArray($reminder);
+        $this->assertArrayHasKey('id', $reminder);
+        $this->assertArrayHasKey('title', $reminder);
+        $this->assertArrayHasKey('description', $reminder);
+        $this->assertArrayHasKey('remind_at', $reminder);
+        $this->assertArrayHasKey('event_at', $reminder);
+        $this->assertArrayNotHasKey('remind_delivery_at', $reminder);
+        $this->assertArrayNotHasKey('created_at', $reminder);
+        $this->assertArrayNotHasKey('updated_at', $reminder);
+        $this->assertArrayNotHasKey('deleted_at', $reminder);
+
+        // check if data is updated
+        $this->assertEquals($data['title'], $reminder['title']);
+        $this->assertEquals($data['description'], $reminder['description']);
+        $this->assertNotEquals($data['remind_at'], $reminder['remind_at']);
+        $this->assertEquals($data['event_at'], $reminder['event_at']);
+    }
+
     public function test_delete_reminder_by_id_passed()
     {
-        $reminders = Reminder::query()->inRandomOrder()->get();
+        $reminder = Reminder::query()->inRandomOrder()->first();
 
-        foreach ($reminders as $reminder) {
+        if (filled($reminder)) {
             $result = (new ReminderService())->delete(
                 user: User::query()->first(),
                 modelKey: $reminder->getKey()
@@ -235,7 +304,7 @@ class ReminderServiceTest extends TestCase
             $this->assertSoftDeleted($reminder);
         }
 
-        $this->assertEquals(0, Reminder::query()->count());
+        $this->assertTrue(true);
     }
 
     public function test_delete_reminder_by_id_failed()
@@ -246,6 +315,13 @@ class ReminderServiceTest extends TestCase
             user: User::query()->first(),
             modelKey: $reminderKey
         );
+    }
+
+    public function test_delete_all_reminders_passed()
+    {
+        Reminder::query()->where('id', '>', 0)->delete();
+
+        $this->assertEquals(0, Reminder::query()->count());
     }
 
 

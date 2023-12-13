@@ -3,7 +3,7 @@
 namespace Tests\Unit\Macros;
 
 use App\Enums\Errors\CommonError;
-use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase;
 use Illuminate\Support\Traits\Macroable;
 use Tests\CreatesApplication;
 

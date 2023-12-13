@@ -4,7 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Enums\Errors\CommonError;
 use App\Models\Reminder;
-use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\CreatesApplication;
 

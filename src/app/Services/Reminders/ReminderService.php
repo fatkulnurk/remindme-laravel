@@ -141,7 +141,7 @@ class ReminderService
         Log::info('send reminders');
 
         // in milliseconds
-        $unixEpoch = CarbonImmutable::now()->timestamp * 1000;
+        $unixEpoch = to_timestamp_second(CarbonImmutable::now()->timestamp);
         Reminder::query()
             ->with(['user:id,name,email'])
             ->whereNull('remind_delivery_at')

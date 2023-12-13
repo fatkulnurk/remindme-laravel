@@ -4,7 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Enums\Errors\CommonError;
 use App\Services\Sessions\SessionService;
-use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\CreatesApplication;
 

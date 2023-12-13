@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Services\Reminders\ReminderService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\CreatesApplication;
 

@@ -72,29 +72,6 @@ class ReminderService
     }
 
     /**
-     * Load a model by the given user and model key.
-     *
-     * @param Model|Authenticatable $user The user instance or authenticatable model.
-     * @param int $modelKey The model key.
-     * @throws \Exception When the reminder is not found.
-     * @return Model The loaded model.
-     */
-    private function loadModel(Model|Authenticatable $user, int $modelKey): Model
-    {
-        $reminder = Reminder::query()
-            ->select($this->defaultColumns)
-            ->where('user_id', $user->getKey())
-            ->where('id', $modelKey)
-            ->first();
-
-        if (blank($reminder)) {
-            throw new \Exception(CommonError::ERR_NOT_FOUND->value, 404);
-        }
-
-        return $reminder;
-    }
-
-    /**
      * Retrieves an array containing the specified user's model data.
      *
      * @param Model|Authenticatable $user The user model or authenticatable instance.
@@ -109,35 +86,26 @@ class ReminderService
     }
 
     /**
-     * Update the given user's model with the provided data.
+     * Load a model by the given user and model key.
      *
-     * @param Model|Authenticatable $user The user model to update.
-     * @param int $modelKey The key of the model to update.
-     * @param array $data The data to update the model with.
-     * @return array The updated model data.
-     * @throws \Exception
-     * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#edit-reminder
+     * @param Model|Authenticatable $user The user instance or authenticatable model.
+     * @param int $modelKey The model key.
+     * @return Model The loaded model.
+     * @throws \Exception When the reminder is not found.
      */
-    public function update(Model|Authenticatable $user, int $modelKey, array $data): array
+    private function loadModel(Model|Authenticatable $user, int $modelKey): Model
     {
-        $reminder = $this->loadModel($user, $modelKey);
-        $data = Arr::whereNotNull($data);
+        $reminder = Reminder::query()
+            ->select($this->defaultColumns)
+            ->where('user_id', $user->getKey())
+            ->where('id', $modelKey)
+            ->first();
 
-        if (filled($data)) {
-            $oldReminder = $reminder->only($this->defaultColumns);
-
-            $data['remind_at'] = isset($data['remind_at']) ? to_timestamp_second($data['remind_at']) : $reminder->remind_at;
-            $data['event_at'] = isset($data['remind_at']) ? to_timestamp_second($data['event_at']) : $reminder->event_at;
-            $reminder->update($data);
-            $reminder->refresh();
-
-            Log::info('update reminder', [
-                'old' => $oldReminder,
-                'new' => $reminder->only($this->defaultColumns)
-            ]);
+        if (blank($reminder)) {
+            throw new \Exception(CommonError::ERR_NOT_FOUND->value, 404);
         }
 
-        return $reminder->only($this->defaultColumns) ?? [];
+        return $reminder;
     }
 
     /**
@@ -168,7 +136,6 @@ class ReminderService
         return true;
     }
 
-
     public function sendReminders(): void
     {
         Log::info('send reminders');
@@ -195,5 +162,46 @@ class ReminderService
                     'remind_delivery_at' => CarbonImmutable::now()
                 ]);
             });
+    }
+
+    /**
+     * Update the given user's model with the provided data.
+     *
+     * @param Model|Authenticatable $user The user model to update.
+     * @param int $modelKey The key of the model to update.
+     * @param array $data The data to update the model with.
+     * @return array The updated model data.
+     * @throws \Exception
+     * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#edit-reminder
+     */
+    public function update(Model|Authenticatable $user, int $modelKey, array $data): array
+    {
+        $reminder = $this->loadModel($user, $modelKey);
+        $data = Arr::whereNotNull($data);
+
+        if (filled($data)) {
+            $oldReminder = $reminder->only($this->defaultColumns);
+
+            if (filled(($data['remind_at'] ?? null))) {
+                $data['remind_at'] = to_timestamp_second($data['remind_at']);
+
+                if ($reminder->remind_at != $data['remind_at']) {
+                    $data['remind_delivery_at'] = null;
+                }
+            } else {
+                $data['remind_at'] = $reminder->remind_at;
+            }
+
+            $data['event_at'] = isset($data['remind_at']) ? to_timestamp_second($data['event_at']) : $reminder->event_at;
+            $reminder->update($data);
+            $reminder->refresh();
+
+            Log::info('update reminder', [
+                'old' => $oldReminder,
+                'new' => $reminder->only($this->defaultColumns)
+            ]);
+        }
+
+        return $reminder->only($this->defaultColumns) ?? [];
     }
 }

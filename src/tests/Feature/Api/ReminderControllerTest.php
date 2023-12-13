@@ -101,6 +101,31 @@ class ReminderControllerTest extends TestCase
         $this->assertEquals($error->toMap(), $data);
     }
 
+    public function test_get_reminders_with_negative_limit_failed(): void
+    {
+        $error = CommonError::ERR_BAD_REQUEST;
+        $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
+        $responseData = $response->json();
+        $accessToken = $responseData['data']['access_token'];
+
+        $response = $this->get(uri: '/api/reminders?limit=-10', headers: [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
+        $data = $response->json();
+
+        $response->assertStatus($error->httpStatusCode());
+
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('ok', $data);
+        $this->assertArrayHasKey('err', $data);
+        $this->assertArrayHasKey('msg', $data);
+
+        $this->assertFalse($data['ok']);
+        $this->assertEquals($error->value, $data['err']);
+    }
+
     #[DataProvider('additionalProvider')]
     public function test_create_reminder_passed($data)
     {
@@ -215,6 +240,32 @@ class ReminderControllerTest extends TestCase
         $this->assertEquals($error->value, $responseData['err']);
     }
 
+    public function test_view_reminder_by_id_non_int_failed()
+    {
+        $error = CommonError::ERR_NOT_FOUND;
+        $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
+        $responseData = $response->json();
+        $accessToken = $responseData['data']['access_token'];
+
+        $reminderKey = 'fatkulnurkoirudin';
+        $response = $this->get(uri: '/api/reminders/' . $reminderKey, headers: [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
+        $responseData = $response->json();
+
+        $response->assertStatus($error->httpStatusCode());
+
+        $this->assertIsArray($responseData);
+        $this->assertArrayHasKey('ok', $responseData);
+        $this->assertArrayHasKey('err', $responseData);
+        $this->assertArrayHasKey('msg', $responseData);
+
+        $this->assertFalse($responseData['ok']);
+        $this->assertEquals($error->value, $responseData['err']);
+    }
+
     #[DataProvider('additionalProvider')]
     public function test_update_reminder_passed($data)
     {
@@ -276,6 +327,33 @@ class ReminderControllerTest extends TestCase
         $this->assertEquals($error->value, $responseData['err']);
     }
 
+
+    #[DataProvider('additionalProvider')]
+    public function test_update_reminder_by_id_non_int_failed($data)
+    {
+        $error = CommonError::ERR_NOT_FOUND;
+        $reminderKey = 'fatkulnurkoirudin';
+
+        $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
+        $responseData = $response->json();
+        $accessToken = $responseData['data']['access_token'];
+
+        $response = $this->put(uri: '/api/reminders/' . $reminderKey, data: $data, headers: [
+            'Authorization' => 'Bearer ' . $accessToken,
+        ]);
+        $responseData = $response->json();
+
+        $response->assertStatus($error->httpStatusCode());
+
+        $this->assertIsArray($responseData);
+        $this->assertArrayHasKey('ok', $responseData);
+        $this->assertArrayHasKey('err', $responseData);
+        $this->assertArrayHasKey('msg', $responseData);
+
+        $this->assertFalse($responseData['ok']);
+        $this->assertEquals($error->value, $responseData['err']);
+    }
+
     public function test_delete_reminder_passed()
     {
         $reminders = Reminder::query()->inRandomOrder()->get();
@@ -304,6 +382,32 @@ class ReminderControllerTest extends TestCase
     {
         $error = CommonError::ERR_NOT_FOUND;
         $reminderKey = PHP_INT_MAX;
+
+        $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
+        $responseData = $response->json();
+        $accessToken = $responseData['data']['access_token'];
+
+        $response = $this->delete(uri: '/api/reminders/' . $reminderKey, headers: [
+            'Authorization' => 'Bearer ' . $accessToken,
+        ]);
+
+        $responseData = $response->json();
+
+        $response->assertStatus($error->httpStatusCode());
+
+        $this->assertIsArray($responseData);
+        $this->assertArrayHasKey('ok', $responseData);
+        $this->assertArrayHasKey('err', $responseData);
+        $this->assertArrayHasKey('msg', $responseData);
+
+        $this->assertFalse($responseData['ok']);
+        $this->assertEquals($error->value, $responseData['err']);
+    }
+
+    public function test_delete_reminder_id_non_int_failed()
+    {
+        $error = CommonError::ERR_NOT_FOUND;
+        $reminderKey = 'fatkulnurkoirudin';
 
         $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
         $responseData = $response->json();

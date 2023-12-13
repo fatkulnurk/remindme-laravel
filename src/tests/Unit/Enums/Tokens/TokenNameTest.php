@@ -3,7 +3,7 @@
 namespace Tests\Unit\Enums\Tokens;
 
 use App\Enums\Tokens\TokenName;
-use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase;
 use Tests\CreatesApplication;
 
 /**

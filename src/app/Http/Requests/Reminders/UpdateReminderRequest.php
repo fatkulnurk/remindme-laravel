@@ -28,4 +28,11 @@ class UpdateReminderRequest extends FormRequest
             'event_at' => ['nullable', 'numeric', 'min:1', 'gte:remind_at'],
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'event_at.gte' => 'The event at must be greater than or equal to the remind at.',
+        ];
+    }
 }

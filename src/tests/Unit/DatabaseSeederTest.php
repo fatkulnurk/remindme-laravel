@@ -3,7 +3,9 @@
 namespace Tests\Unit;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\TestCase;
+use Database\Seeders\UserSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\CreatesApplication;
@@ -14,9 +16,10 @@ use Tests\CreatesApplication;
  * */
 class DatabaseSeederTest extends TestCase
 {
-    use CreatesApplication;
+    use CreatesApplication, RefreshDatabase;
 
     protected bool $seed = true;
+    protected string $seeder = UserSeeder::class;
 
     public static function providerData()
     {

@@ -4,8 +4,9 @@ namespace Tests\Feature\Api;
 
 use App\Enums\Errors\CommonError;
 use App\Models\Reminder;
+use Illuminate\Foundation\Testing\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\TestCase;
+use Tests\CreatesApplication;
 
 /**
  * @package Tests\Feature\Api
@@ -13,6 +14,8 @@ use Tests\TestCase;
  * */
 class ReminderControllerTest extends TestCase
 {
+    use CreatesApplication;
+
     private array $defaultCredential = [];
     protected function setUp(): void
     {
@@ -275,22 +278,26 @@ class ReminderControllerTest extends TestCase
 
     public function test_delete_reminder_passed()
     {
-        $reminder = Reminder::query()->inRandomOrder()->first();
-        $reminderKey = $reminder->getKey();
+        $reminders = Reminder::query()->inRandomOrder()->get();
+        foreach ($reminders as $reminder) {
+            $reminderKey = $reminder->getKey();
 
-        $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
-        $responseData = $response->json();
-        $accessToken = $responseData['data']['access_token'];
+            $response = $this->post(uri: '/api/session', data: $this->defaultCredential);
+            $responseData = $response->json();
+            $accessToken = $responseData['data']['access_token'];
 
-        $response = $this->delete(uri: '/api/reminders/' . $reminderKey, headers: [
-            'Authorization' => 'Bearer ' . $accessToken,
-        ]);
-        $responseData = $response->json();
+            $response = $this->delete(uri: '/api/reminders/' . $reminderKey, headers: [
+                'Authorization' => 'Bearer ' . $accessToken,
+            ]);
+            $responseData = $response->json();
 
-        $response->assertStatus(200);
-        $this->assertIsArray($responseData);
-        $this->assertTrue($responseData['ok']);
-        $this->assertSoftDeleted($reminder);
+            $response->assertStatus(200);
+            $this->assertIsArray($responseData);
+            $this->assertTrue($responseData['ok']);
+            $this->assertSoftDeleted($reminder);
+        }
+
+        $this->assertEquals(0, Reminder::query()->count());
     }
 
     public function test_delete_reminder_failed()

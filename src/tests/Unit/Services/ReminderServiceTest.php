@@ -19,8 +19,6 @@ class ReminderServiceTest extends TestCase
 {
     use CreatesApplication;
 
-    protected bool $seed = true;
-
     private Model $user;
 
 
@@ -222,17 +220,22 @@ class ReminderServiceTest extends TestCase
 
     public function test_delete_reminder_by_id_passed()
     {
-        $reminder = Reminder::query()->inRandomOrder()->first();
-        $result = (new ReminderService())->delete(
-            user: User::query()->first(),
-            modelKey: $reminder->getKey()
-        );
+        $reminders = Reminder::query()->inRandomOrder()->get();
 
-        // check if data is returned
-        $this->assertIsBool($result);
+        foreach ($reminders as $reminder) {
+            $result = (new ReminderService())->delete(
+                user: User::query()->first(),
+                modelKey: $reminder->getKey()
+            );
 
-        // check if data is soft deleted
-        $this->assertSoftDeleted($reminder);
+            // check if data is returned
+            $this->assertIsBool($result);
+
+            // check if data is soft deleted
+            $this->assertSoftDeleted($reminder);
+        }
+
+        $this->assertEquals(0, Reminder::query()->count());
     }
 
     public function test_delete_reminder_by_id_failed()

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Foundation\Testing\TestCase;
 use Tests\CreatesApplication;
+use Tests\TestCase;
 
 class HelperTest extends TestCase
 {

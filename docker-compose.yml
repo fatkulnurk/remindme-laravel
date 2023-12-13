@@ -5,6 +5,20 @@ networks:
     remindme-network:
 
 services:
+    schedule:
+        build:
+            context: ./docker
+            dockerfile: php.dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
+        volumes:
+            - ./src:/var/www/html:delegated
+        command: [ 'php', 'artisan', 'schedule:work' ]
+        restart: always
+        networks:
+            - remindme-network
+
     app:
         build:
             context: ./docker
@@ -15,10 +29,9 @@ services:
         ports:
             - "8066:80"
         volumes:
-            - ./:/var/www/html:delegated
+            - ./src:/var/www/html:delegated
         depends_on:
             - php
-#            - redis
             - mysql
             - mailpit
             - schedule
@@ -35,7 +48,7 @@ services:
         ports:
             - "9000:9000"
         volumes:
-            - ./:/var/www/html:delegated
+            - ./src:/var/www/html:delegated
         networks:
             - remindme-network
 
@@ -47,24 +60,10 @@ services:
                 - UID=${UID:-1000}
                 - GID=${GID:-1000}
         volumes:
-            - ./:/var/www/html
+            - ./src:/var/www/html
         depends_on:
             - php
         entrypoint: [ 'composer', '--ignore-platform-reqs' ]
-        networks:
-            - remindme-network
-
-    schedule:
-        build:
-            context: ./docker
-            dockerfile: php.dockerfile
-            args:
-                - UID=${UID:-1000}
-                - GID=${GID:-1000}
-        volumes:
-            - ./:/var/www/html:delegated
-        command:
-            - php /var/www/html/artisan schedule:work
         networks:
             - remindme-network
 
@@ -98,7 +97,7 @@ services:
     npm:
         image: node:current-alpine
         volumes:
-            - ./:/var/www/html
+            - ./src:/var/www/html
         ports:
             - "3000:3000"
             - "3001:3001"
@@ -116,7 +115,7 @@ services:
                 - UID=${UID:-1000}
                 - GID=${GID:-1000}
         volumes:
-            - ./:/var/www/html:delegated
+            - ./src:/var/www/html:delegated
         depends_on:
             - mysql
         entrypoint: [ 'php', '/var/www/html/artisan' ]

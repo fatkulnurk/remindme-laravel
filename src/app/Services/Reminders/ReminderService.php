@@ -75,12 +75,12 @@ class ReminderService
      * Retrieves an array containing the specified user's model data.
      *
      * @param Model|Authenticatable $user The user model or authenticatable instance.
-     * @param int $modelKey The key of the model.
+     * @param int|string $modelKey The key of the model.
      * @return array An array containing the model data.
      * @throws \Exception
      * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#view-reminder
      */
-    public function view(Model|Authenticatable $user, int $modelKey): array
+    public function view(Model|Authenticatable $user, int|string $modelKey): array
     {
         return $this->loadModel($user, $modelKey)->only($this->defaultColumns) ?? [];
     }
@@ -89,11 +89,11 @@ class ReminderService
      * Load a model by the given user and model key.
      *
      * @param Model|Authenticatable $user The user instance or authenticatable model.
-     * @param int $modelKey The model key.
+     * @param int|string $modelKey The model key.
      * @return Model The loaded model.
      * @throws \Exception When the reminder is not found.
      */
-    private function loadModel(Model|Authenticatable $user, int $modelKey): Model
+    private function loadModel(Model|Authenticatable $user, int|string $modelKey): Model
     {
         $reminder = Reminder::query()
             ->select($this->defaultColumns)
@@ -112,12 +112,12 @@ class ReminderService
      * Deletes a reminder for a user.
      *
      * @param Model|Authenticatable $user The user model.
-     * @param int $modelKey The model key.
+     * @param int|string $modelKey The model key.
      * @return bool The result of the deletion.
      * @throws \Exception If the reminder is not found.
      * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#delete-reminder
      */
-    public function delete(Model|Authenticatable $user, int $modelKey): bool
+    public function delete(Model|Authenticatable $user, int|string $modelKey): bool
     {
         $reminder = $this->loadModel($user, $modelKey);
 
@@ -168,13 +168,13 @@ class ReminderService
      * Update the given user's model with the provided data.
      *
      * @param Model|Authenticatable $user The user model to update.
-     * @param int $modelKey The key of the model to update.
+     * @param int|string $modelKey The key of the model to update.
      * @param array $data The data to update the model with.
      * @return array The updated model data.
      * @throws \Exception
      * @link https://github.com/riandyrn/remindme-laravel/blob/main/docs/rest_api.md#edit-reminder
      */
-    public function update(Model|Authenticatable $user, int $modelKey, array $data): array
+    public function update(Model|Authenticatable $user, int|string $modelKey, array $data): array
     {
         $reminder = $this->loadModel($user, $modelKey);
         $data = Arr::whereNotNull($data);

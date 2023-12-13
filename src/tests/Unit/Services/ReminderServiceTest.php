@@ -176,6 +176,17 @@ class ReminderServiceTest extends TestCase
         );
     }
 
+    public function test_view_reminder_by_id_non_int_failed()
+    {
+        $this->expectException(\Exception::class);
+
+        $reminderKey = 'fatkulnurkoirudin';
+        (new ReminderService())->view(
+            user: $this->user,
+            modelKey: $reminderKey
+        );
+    }
+
     #[DataProvider('additionalProvider')]
     public function test_update_reminder_by_id_passed($data)
     {
@@ -211,6 +222,19 @@ class ReminderServiceTest extends TestCase
         $this->expectException(\Exception::class);
 
         $reminderKey = PHP_INT_MAX;
+        $reminder = (new ReminderService())->update(
+            user: $this->user,
+            modelKey: $reminderKey,
+            data: $data
+        );
+    }
+
+    #[DataProvider('additionalProvider')]
+    public function test_update_reminder_by_id_non_int_failed($data)
+    {
+        $this->expectException(\Exception::class);
+
+        $reminderKey = 'fatkulnurkoirudin';
         $reminder = (new ReminderService())->update(
             user: $this->user,
             modelKey: $reminderKey,
@@ -312,6 +336,16 @@ class ReminderServiceTest extends TestCase
         $this->expectException(\Exception::class);
         $reminderKey = PHP_INT_MAX;
         $result = (new ReminderService())->delete(
+            user: User::query()->first(),
+            modelKey: $reminderKey
+        );
+    }
+
+    public function test_delete_reminder_by_id_non_int_failed()
+    {
+        $this->expectException(\Exception::class);
+        $reminderKey = 'fatkulnurkoirudin';
+        (new ReminderService())->delete(
             user: User::query()->first(),
             modelKey: $reminderKey
         );

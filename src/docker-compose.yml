@@ -1,0 +1,136 @@
+version: '3'
+name: remindme
+
+networks:
+    remindme-network:
+
+services:
+    app:
+        build:
+            context: ./docker
+            dockerfile: nginx.dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
+        ports:
+            - "8066:80"
+        volumes:
+            - ./:/var/www/html:delegated
+        depends_on:
+            - php
+#            - redis
+            - mysql
+            - mailpit
+            - schedule
+        networks:
+            - remindme-network
+
+    php:
+        build:
+            context: ./docker
+            dockerfile: php.dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./:/var/www/html:delegated
+        networks:
+            - remindme-network
+
+    composer:
+        build:
+            context: ./docker
+            dockerfile: php.dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - php
+        entrypoint: [ 'composer', '--ignore-platform-reqs' ]
+        networks:
+            - remindme-network
+
+    schedule:
+        build:
+            context: ./docker
+            dockerfile: php.dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
+        volumes:
+            - ./:/var/www/html:delegated
+        command:
+            - php /var/www/html/artisan schedule:work
+        networks:
+            - remindme-network
+
+    mailpit:
+        image: axllent/mailpit
+        ports:
+            - 48025:8025
+            - 41025:1025
+        networks:
+            - remindme-network
+
+    mysql:
+        image: mysql:8.2
+        restart: unless-stopped
+        command: --default-authentication-plugin=mysql_native_password
+        tty: true
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./docker/data/mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: remindme
+            MYSQL_USER: fatkulnurk
+            MYSQL_PASSWORD: fatkulnurksecret
+            MYSQL_ROOT_PASSWORD: secret
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        networks:
+            - remindme-network
+
+    npm:
+        image: node:current-alpine
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - "3000:3000"
+            - "3001:3001"
+            - "5173:5173"
+        working_dir: /var/www/html
+        entrypoint: [ 'npm' ]
+        networks:
+            - remindme-network
+
+    artisan:
+        build:
+            context: ./docker
+            dockerfile: php.dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
+        volumes:
+            - ./:/var/www/html:delegated
+        depends_on:
+            - mysql
+        entrypoint: [ 'php', '/var/www/html/artisan' ]
+        networks:
+            - remindme-network
+
+    redis:
+        image: redis:alpine
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        networks:
+            - remindme-network
+
+
+
+

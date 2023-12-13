@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('/session', [\App\Http\Controllers\Api\SessionController::class, 'login']);
+Route::put('/session', [\App\Http\Controllers\Api\SessionController::class, 'refresh']);
+Route::apiResource('/reminders', App\Http\Controllers\Api\ReminderController::class)
+    ->middleware('auth:sanctum');

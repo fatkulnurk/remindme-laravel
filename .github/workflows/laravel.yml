@@ -1,10 +1,6 @@
-name: Continuous Integration
+name: Laravel Tests
 
-on:
-  push:
-    branches: [ "development" ]
-  pull_request:
-    branches: [ "development" ]
+on: [push]
 
 jobs:
   laravel-setup-and-test:
@@ -51,9 +47,9 @@ jobs:
         working-directory: src
         run: npm run build
 
-  laravel-docker-compose:
+  laravel-unit-test-via-docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build docker & running
-        run: docker compose up -d app
+      - name: Build docker & running unit test
+        run: docker compose -f docker-compose.ci.yml up --build  --abort-on-container-exit

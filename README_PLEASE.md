@@ -38,18 +38,20 @@ Important information.
 
 ## URL & Credential
 
-| Service               | full url               | host      | port  | description                                                                                                                                              |
-|-----------------------|------------------------|-----------|-------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| App & Api             | http://127.0.0.1:8066  | 127.0.0.1 | 8066  | email: alice@mail.com, password: 123456,<br/>email: bob@mail.com, password: 123456                                                                       |
-| MySQL                 |                        | 127.0.0.1 | 3306  | MYSQL_DATABASE: remindme,<br/>MYSQL_USER: fatkulnurk, <br/>MYSQL_PASSWORD: fatkulnurksecret, <br/>MYSQL_ROOT_PASSWORD: secret , <br/>SERVICE_NAME: mysql |
-| Mailpit (webmail)     | http://127.0.0.1:48025 | 127.0.0.1 | 48025 | webmail                                                                                                                                                  |
-| Mailpit (mail server) | http://127.0.0.1:41025 | 127.0.0.1 | 41025 | mail server                                                                                                                                              |
+| Service               | full url               | host      | port  | description                                                                                                                                   |
+|-----------------------|------------------------|-----------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| App & Api             | http://127.0.0.1:8066  | 127.0.0.1 | 8066  | email: alice@mail.com, password: 123456,<br/>email: bob@mail.com, password: 123456                                                            |
+| MySQL                 |                        | 127.0.0.1 | 3306  | MYSQL_DATABASE: default,<br/>MYSQL_USER: laravel, <br/>MYSQL_PASSWORD: secret, <br/>MYSQL_ROOT_PASSWORD: secret , <br/>SERVICE_NAME: database |
+| Mailpit (webmail)     | http://127.0.0.1:48025 | 127.0.0.1 | 48025 | webmail                                                                                                                                       |
+| Mailpit (mail server) | http://127.0.0.1:41025 | 127.0.0.1 | 41025 | mail server                                                                                                                                   |
 
 ## Installation
 
-Before accessing the website, make sure to build the application using `npm run build`. The build folder is included in
-the .gitignore by default from Laravel team. If you encounter any issues about vite/Compiling Assets, follow the
-tutorial provided at the very end (Compiling Assets).
+[//]: # (Before accessing the website, make sure to build the application using `npm run build`. The build folder is included in)
+
+[//]: # (the .gitignore by default from Laravel team. If you encounter any issues about vite/Compiling Assets, follow the)
+
+[//]: # (tutorial provided at the very end &#40;Compiling Assets&#41;.)
 
 **git clone this project**
 
@@ -68,83 +70,150 @@ More or less, later you will find a structure like this (I display hidden files,
 ```text
 ./
 ├── docker
+├── docker-compose.ci.yml
+├── docker-compose.prod.yml
 ├── docker-compose.yml
 ├── docs
 ├── .git
 ├── .github
 ├── .gitignore
-├── .idea
+├── image.Dockerfile
 ├── README.md
 ├── README_PLEASE.md
 └── src
+
 ```
 
-**Run Docker**
-
-```text
-docker compose up -d app
+Run Docker for Development
+```shell
+docker compose up --build
 ```
 
-**for some case, if you need rebuild, run this**
-
-```text
-docker compose build --no-cache
+Run Docker for Unit & Feature Test
+```shell
+docker compose -f docker-compose.ci.yml up --build  --abort-on-container-exit
 ```
 
-**install dependency**
+Run Docker for Production
+```shell
+docker compose -f docker-compose.pod.yml up --build 
 
-```text
-docker compose run --rm composer install
 ```
 
-**copy .env.example to .env**
 
-```text
-cp src/.env.example src/.env
-```
+[//]: # (### deprecated)
 
-**Generate Key**
+[//]: # (**Run Docker**)
 
-```text
-docker compose run --rm artisan key:generate
-```
+[//]: # ()
+[//]: # (```text)
 
-**Migrate database**
+[//]: # (docker compose up -d app)
 
-```text
-docker compose run --rm artisan migrate:fresh --seed
-```
+[//]: # (```)
 
-**Clear Optimize**
+[//]: # ()
+[//]: # (**for some case, if you need rebuild, run this**)
 
-```text
-docker compose run --rm artisan optimize:clear
-```
+[//]: # ()
+[//]: # (```text)
 
-**Run Test (Unit Test & Feature Test)**
+[//]: # (docker compose build --no-cache)
 
-```text
-docker compose run --rm artisan test
-```
+[//]: # (```)
 
----
+[//]: # ()
+[//]: # (**install dependency**)
 
-**Dev Server & Compiling Assets**
+[//]: # ()
+[//]: # (```text)
 
-install dependency (like `npm install`)
+[//]: # (docker compose run --rm composer install)
 
-```text
-docker compose run --rm npm install
-```
+[//]: # (```)
 
-for dev server (like `npm run dev`), you can run with command:
+[//]: # ()
+[//]: # (**copy .env.example to .env**)
 
-```text
-docker compose run --rm --service-ports npm run dev
-```
+[//]: # ()
+[//]: # (```text)
 
-or, if you need build (like `npm run build`), run this command:
+[//]: # (cp src/.env.example src/.env)
 
-```text
-docker compose run --rm npm run build
-```
+[//]: # (```)
+
+[//]: # ()
+[//]: # (**Generate Key**)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm artisan key:generate)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (**Migrate database**)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm artisan migrate:fresh --seed)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (**Clear Optimize**)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm artisan optimize:clear)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (**Run Test &#40;Unit Test & Feature Test&#41;**)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm artisan test)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (---)
+
+[//]: # ()
+[//]: # (**Dev Server & Compiling Assets**)
+
+[//]: # ()
+[//]: # (install dependency &#40;like `npm install`&#41;)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm npm install)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (for dev server &#40;like `npm run dev`&#41;, you can run with command:)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm --service-ports npm run dev)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (or, if you need build &#40;like `npm run build`&#41;, run this command:)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (docker compose run --rm npm run build)
+
+[//]: # (```)

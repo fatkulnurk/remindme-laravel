@@ -3,7 +3,7 @@ name: Laravel Deployment
 on:
   push:
     branches:
-      - production
+      - main
 
 jobs:
   deploy:
@@ -22,6 +22,6 @@ jobs:
           SSH_HOST: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
           SSH_PASSWORD: ${{ secrets.DEPLOYMENT_SERVER_PASSWORD }}
         run: |
-          sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SERVER_IP  "cd reminme-laravel && \
+          sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SSH_HOST  "cd remindme-laravel && \
           git pull && \
           docker compose build -f docker-compose.prod.yml --no-cache"

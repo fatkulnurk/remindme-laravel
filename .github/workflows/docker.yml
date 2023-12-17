@@ -1,0 +1,25 @@
+name: Docker Build Testing
+on: [ push ]
+
+jobs:
+  build-docker-compose-development:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker compose up --build
+  build-docker-compose-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker compose -f docker-compose.ci.yml up --build  --abort-on-container-exit
+  build-docker-compose-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker compose -f docker-compose.prod.yml up --build

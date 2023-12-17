@@ -10,7 +10,6 @@ services:
         - GID=${GID:-1000}
     ports:
       - "8066:8080"
-      - "5173:5173"
     depends_on:
       database:
         condition: service_healthy
@@ -20,8 +19,8 @@ services:
         condition: service_healthy
     volumes:
       - app-storage:/var/www/storage
-      - ./docker/entrypoint.dev.sh:/var/www/docker/entrypoint.sh
-    entrypoint: /var/www/docker/entrypoint.sh
+      - ./docker/entrypoint.ci.sh:/var/www/docker/entrypoint.sh
+    command: sh -c /var/www/docker/entrypoint.sh && exit
 
   database:
     image: mysql:8.0

@@ -1,0 +1,45 @@
+name: Docker Build Testing
+on: [ push ]
+
+jobs:
+  build-docker-compose-development:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker compose up --build -d
+      - name: Check Docker container status
+        run: docker compose ps
+      - name: Clean up Docker containers
+        run: docker compose down
+      - name: Mark workflow as successful
+        run: echo "Workflow succeeded!"
+
+  build-docker-compose-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker compose -f docker-compose.ci.yml up --build  --abort-on-container-exit
+      - name: Check Docker container status
+        run: docker compose ps
+      - name: Clean up Docker containers
+        run: docker compose down
+      - name: Mark workflow as successful
+        run: echo "Workflow succeeded!"
+
+  build-docker-compose-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker compose -f docker-compose.prod.yml up --build -d
+      - name: Check Docker container status
+        run: docker compose ps
+      - name: Clean up Docker containers
+        run: docker compose down
+      - name: Mark workflow as successful
+        run: echo "Workflow succeeded!"

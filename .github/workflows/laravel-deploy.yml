@@ -1,0 +1,27 @@
+name: Laravel Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install sshpass for login with password in ssh
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Deploy to production
+        env:
+          SSH_USER: ${{ secrets.DEPLOYMENT_SERVER_USER }}
+          SSH_HOST: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
+          SSH_PASSWORD: ${{ secrets.DEPLOYMENT_SERVER_PASSWORD }}
+        run: |
+          sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SSH_HOST  "cd remindme-laravel && \
+          git pull && \
+          docker compose build -f docker-compose.prod.yml --no-cache"

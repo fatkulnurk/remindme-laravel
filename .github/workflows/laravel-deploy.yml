@@ -1,6 +1,6 @@
 name: Laravel Deployment
 
-on: [push]
+on: [ push ]
 
 jobs:
   deploy:
@@ -10,18 +10,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set Up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa ${{ secrets.DEPLOYMENT_SERVER_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy ke Produksi
-        env:
-          SSH_USER: ${{ secrets.DEPLOYMENT_SERVER_USER }}
-          SSH_HOST: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd remindme-laravel&& \
-          git pull && \
-          docker compose build -f docker-compose.prod.yml --no-cache"
+      # Your SSH step
+      - name: Run sshpass commands
+        uses: matheusvanzan/sshpass-action@v2
+        with:
+          host: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
+          user: ${{ secrets.DEPLOYMENT_SERVER_USER }}
+          pass: ${{ secrets.DEPLOYMENT_SERVER_PASSWORD }}
+          run: |
+            cd remindme-laravel
+            git pull
+            docker compose -f docker-compose.prod.yml up --build

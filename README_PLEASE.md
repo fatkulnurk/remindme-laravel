@@ -97,7 +97,6 @@ docker compose -f docker-compose.ci.yml up --build  --abort-on-container-exit
 Run Docker for Production
 ```shell
 docker compose -f docker-compose.prod.yml up --build 
-
 ```
 
 

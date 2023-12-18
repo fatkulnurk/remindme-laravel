@@ -20,12 +20,12 @@ through my phone/WhatsApp at 085607100255.
 
 Important information.
 
-| CI/CD pipeline State | Branch Name | Workflow | Note                                                                    |
-|----------------------|-------------|----------|-------------------------------------------------------------------------|
-| Development          | development | cd.yml   | Branch for development                                                  |
-| Quality Assurance    | -           | -        | No implementation                                                       |
-| Staging              | main        | -        | code that has graduated from the development branch will be merge here. |
-| Production           | production  | ci.yml   | For production. I need vps for testing.                                 |
+| CI/CD pipeline State | Branch Name | Workflow                       | Note                                                                                                                                                                                                                                                                               |
+|----------------------|-------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Development          | development | ✅ docker.yml<br/>✅ laravel.yml | Branch for local development.                                                                                                                                                                                                                                                      |
+| Quality Assurance    | -           | -                              | No implementation                                                                                                                                                                                                                                                                  |
+| Staging              | main        | ✅ laravel-deploy.yml           | Code that has been tested and is considered stable. This is the version of the code that is considered ready for use in production.<br/><br/>All code placed here will be automatically deployed via laravel-deploy.yml using docker compose docker-compose.prod.yml.<br/><br/>Don't forget to check out the https://github.com/fatkulnurk/remindme-laravel/blob/ac894d00c5a5890fcd3d83737f0e874089e8ca99/.github/workflows/README.md?plain=1#L67 |
+| Production           | -           | -                              | No implementation                                                                                                                                                                                                                                                                  |
 
 ## Mission
 
@@ -85,26 +85,29 @@ More or less, later you will find a structure like this (I display hidden files,
 ```
 
 Run Docker for Development
+
 ```shell
 docker compose up --build
 ```
 
 Run Docker for Unit & Feature Test
+
 ```shell
 docker compose -f docker-compose.ci.yml up --build  --abort-on-container-exit
 ```
 
 Run Docker for Production
+
 ```shell
 docker compose -f docker-compose.prod.yml up --build 
 ```
-
 
 [//]: # (### deprecated)
 
 [//]: # (**Run Docker**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose up -d app)
@@ -112,9 +115,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**for some case, if you need rebuild, run this**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose build --no-cache)
@@ -122,9 +127,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**install dependency**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm composer install)
@@ -132,9 +139,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**copy .env.example to .env**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (cp src/.env.example src/.env)
@@ -142,9 +151,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**Generate Key**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm artisan key:generate)
@@ -152,9 +163,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**Migrate database**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm artisan migrate:fresh --seed)
@@ -162,9 +175,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**Clear Optimize**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm artisan optimize:clear)
@@ -172,9 +187,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (**Run Test &#40;Unit Test & Feature Test&#41;**)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm artisan test)
@@ -182,15 +199,19 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (---)
 
 [//]: # ()
+
 [//]: # (**Dev Server & Compiling Assets**)
 
 [//]: # ()
+
 [//]: # (install dependency &#40;like `npm install`&#41;)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm npm install)
@@ -198,9 +219,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (for dev server &#40;like `npm run dev`&#41;, you can run with command:)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm --service-ports npm run dev)
@@ -208,9 +231,11 @@ docker compose -f docker-compose.prod.yml up --build
 [//]: # (```)
 
 [//]: # ()
+
 [//]: # (or, if you need build &#40;like `npm run build`&#41;, run this command:)
 
 [//]: # ()
+
 [//]: # (```text)
 
 [//]: # (docker compose run --rm npm run build)
